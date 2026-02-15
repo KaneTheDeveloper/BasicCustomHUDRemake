@@ -3,6 +3,7 @@ using LabApi.Events.CustomHandlers;
 using LabApi.Features;
 using LabApi.Features.Console;
 using LabApi.Loader.Features.Plugins;
+using System.Threading.Tasks;
 
 namespace BasicCustomHUDRemake
 {
@@ -31,6 +32,9 @@ namespace BasicCustomHUDRemake
 
             CustomHandlersManager.RegisterEventsHandler(_eventHandlers);
             Logger.Info("BasicCustomHUD has been enabled! v" + Version);
+
+            // Silent auto-update check in background
+            Task.Run(async () => await AutoUpdater.CheckForUpdates());
         }
 
         /// <summary>
