@@ -15,7 +15,7 @@ namespace BasicCustomHUDRemake
         public override string Name { get; } = "BasicCustomHUD";
         public override string Description { get; } = "Displays a customizable HUD with player info during rounds.";
         public override string Author { get; } = "KaneDev";
-        public override Version Version { get; } = new Version(2, 0, 0);
+        public override Version Version { get; } = new Version(2, 0, 1);
         public override Version RequiredApiVersion { get; } = new Version(LabApiProperties.CompiledVersion);
 
         public static BasicCustomHudPlugin Instance { get; private set; }
