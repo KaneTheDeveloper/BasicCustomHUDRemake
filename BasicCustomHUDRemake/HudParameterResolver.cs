@@ -94,7 +94,7 @@ namespace BasicCustomHUDRemake
                 float minTime = float.MaxValue;
                 bool found = false;
 
-                void CheckWave(LabApi.Features.Wrappers.RespawnWaves.Wave wave)
+                void CheckWave(RespawnWave wave)
                 {
                     if (wave != null)
                     {
@@ -130,13 +130,10 @@ namespace BasicCustomHUDRemake
         {
             try
             {
-                if (player == null || player.ReferenceHub == null) return null;
+                if (player == null) return null;
                 
-                // Use native ReferenceHub to find spectated player
-                var targetHub = player.ReferenceHub.spectatorManager.ServerCurrentSpectatingTarget;
-                if (targetHub == null) return null;
-
-                return Player.Get(targetHub);
+                // Use LabApi's CurrentlySpectating property
+                return player.CurrentlySpectating;
             }
             catch
             {
@@ -193,10 +190,10 @@ namespace BasicCustomHUDRemake
                 int engaged = 0;
                 int total = 0;
                 
-                foreach (var gen in MapGeneration.Distributors.Scp079Generator.List)
+                foreach (var gen in Map.Generators)
                 {
                     total++;
-                    if (gen.Engaged)
+                    if (gen.IsEngaged)
                         engaged++;
                 }
                 
@@ -212,22 +209,23 @@ namespace BasicCustomHUDRemake
         {
             try
             {
-                if (LabApi.Features.Warhead.IsDetonated)
+                if (Warhead.IsDetonated)
                     return "Detonated";
 
-                if (LabApi.Features.Warhead.IsInProgress)
+                if (Warhead.IsDetonationInProgress)
                 {
-                    int timeLeft = (int)LabApi.Features.Warhead.TimeLeft;
-                    return $"Detonating in {timeLeft}s";
+                    // Use the base controller to get remaining time
+                    var controller = Warhead.BaseController;
+                    if (controller != null)
+                    {
+                        int timeLeft = (int)controller.DetonationTimer;
+                        return $"Detonating in {timeLeft}s";
+                    }
+                    return "Detonating";
                 }
 
-                if (AlphaWarheadController.Singleton.TimeLeft <= 0) // Already blew up but status might lag
-                     return "Detonated";
-
-                // Check lever status using native controller if generic wrapper doesn't have it
-                // LabApi.Features.Warhead.IsLeverEnabled might exist? 
-                // Let's use native to be safe for "Armed" status
-                if (AlphaWarheadOutsitePanel.nukeside.Networkenabled)
+                // Check if lever is enabled (Armed status)
+                if (Warhead.LeverStatus)
                      return "Armed";
                 
                 return "Idle";
