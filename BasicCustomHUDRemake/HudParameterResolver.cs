@@ -1,6 +1,10 @@
 using System;
+using System.Linq;
 using System.Text.RegularExpressions;
 using LabApi.Features.Wrappers;
+using PlayerRoles;
+using Respawning;
+using Respawning.Waves;
 
 namespace BasicCustomHUDRemake
 {
@@ -61,6 +65,7 @@ namespace BasicCustomHUDRemake
                         return GetChaosSpawnTime();
 
                     case "nextspawn":
+                    case "nextwave":
                         return GetNextSpawnTime();
 
                     case "spectated_name":
@@ -87,35 +92,45 @@ namespace BasicCustomHUDRemake
             });
         }
 
+        /// <summary>
+        /// Gets the time until the next spawn wave.
+        /// Uses the same approach as RespawnTimer plugin:
+        /// - During normal countdown: reads Timer.TimeLeft from all TimeBasedWave instances
+        /// - When wave is selected/spawning: shows "Spawning..."
+        /// </summary>
         private static string GetNextSpawnTime()
         {
             try
             {
+                // When wave is selected or spawning, show spawnings status
+                var state = WaveManager.State;
+                if (state == WaveQueueState.WaveSelected || state == WaveQueueState.WaveSpawning)
+                    return "Spawning...";
+
+                var waves = WaveManager.Waves.OfType<TimeBasedWave>().ToList();
                 float minTime = float.MaxValue;
                 bool found = false;
 
-                void CheckWave(RespawnWave wave)
+                foreach (var tbw in waves)
                 {
-                    if (wave != null)
+                    try
                     {
-                        float t = wave.TimeLeft;
+                        float t = tbw.Timer.TimeLeft;
                         if (t > 0 && t < minTime)
                         {
                             minTime = t;
                             found = true;
                         }
                     }
+                    catch { }
                 }
-
-                CheckWave(RespawnWaves.PrimaryMtfWave);
-                CheckWave(RespawnWaves.MiniMtfWave);
-                CheckWave(RespawnWaves.PrimaryChaosWave);
-                CheckWave(RespawnWaves.MiniChaosWave);
 
                 if (found)
                 {
-                    var ts = TimeSpan.FromSeconds(minTime);
-                    return $"{ts.Minutes:D2}:{ts.Seconds:D2}";
+                    int totalSeconds = Math.Max(0, (int)minTime);
+                    int minutes = totalSeconds / 60;
+                    int seconds = totalSeconds % 60;
+                    return $"{minutes:D2}:{seconds:D2}";
                 }
 
                 return "N/A";
@@ -237,26 +252,26 @@ namespace BasicCustomHUDRemake
         {
             try
             {
-                // check main wave first, then mini wave
-                var mainWave = RespawnWaves.PrimaryMtfWave;
-                if (mainWave != null)
+                // Check if MTF wave is currently spawning
+                var mtfState = WaveManager.State;
+                if (mtfState == WaveQueueState.WaveSelected || mtfState == WaveQueueState.WaveSpawning)
                 {
-                    float timeLeft = mainWave.TimeLeft;
-                    if (timeLeft > 0)
-                    {
-                        var ts = TimeSpan.FromSeconds(timeLeft);
-                        return $"{ts.Minutes:D2}:{ts.Seconds:D2}";
-                    }
+                    // Check if any MTF wave timer is ready
+                    var readyNtf = WaveManager.Waves.OfType<NtfSpawnWave>().FirstOrDefault(w => w.Timer.IsReadyToSpawn);
+                    if (readyNtf != null)
+                        return "Spawning...";
                 }
 
-                var miniWave = RespawnWaves.MiniMtfWave;
-                if (miniWave != null)
+                var ntf = WaveManager.Waves.OfType<NtfSpawnWave>().FirstOrDefault();
+                if (ntf != null)
                 {
-                    float timeLeft = miniWave.TimeLeft;
-                    if (timeLeft > 0)
+                    float t = ntf.Timer.TimeLeft;
+                    if (t > 0)
                     {
-                        var ts = TimeSpan.FromSeconds(timeLeft);
-                        return $"{ts.Minutes:D2}:{ts.Seconds:D2}";
+                        int totalSeconds = Math.Max(0, (int)t);
+                        int minutes = totalSeconds / 60;
+                        int seconds = totalSeconds % 60;
+                        return $"{minutes:D2}:{seconds:D2}";
                     }
                 }
 
@@ -272,25 +287,26 @@ namespace BasicCustomHUDRemake
         {
             try
             {
-                var mainWave = RespawnWaves.PrimaryChaosWave;
-                if (mainWave != null)
+                // Check if Chaos wave is currently spawning
+                var ciState = WaveManager.State;
+                if (ciState == WaveQueueState.WaveSelected || ciState == WaveQueueState.WaveSpawning)
                 {
-                    float timeLeft = mainWave.TimeLeft;
-                    if (timeLeft > 0)
-                    {
-                        var ts = TimeSpan.FromSeconds(timeLeft);
-                        return $"{ts.Minutes:D2}:{ts.Seconds:D2}";
-                    }
+                    // Check if any Chaos wave timer is ready
+                    var readyCi = WaveManager.Waves.OfType<ChaosSpawnWave>().FirstOrDefault(w => w.Timer.IsReadyToSpawn);
+                    if (readyCi != null)
+                        return "Spawning...";
                 }
 
-                var miniWave = RespawnWaves.MiniChaosWave;
-                if (miniWave != null)
+                var ci = WaveManager.Waves.OfType<ChaosSpawnWave>().FirstOrDefault();
+                if (ci != null)
                 {
-                    float timeLeft = miniWave.TimeLeft;
-                    if (timeLeft > 0)
+                    float t = ci.Timer.TimeLeft;
+                    if (t > 0)
                     {
-                        var ts = TimeSpan.FromSeconds(timeLeft);
-                        return $"{ts.Minutes:D2}:{ts.Seconds:D2}";
+                        int totalSeconds = Math.Max(0, (int)t);
+                        int minutes = totalSeconds / 60;
+                        int seconds = totalSeconds % 60;
+                        return $"{minutes:D2}:{seconds:D2}";
                     }
                 }
 

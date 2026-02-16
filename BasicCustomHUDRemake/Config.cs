@@ -30,7 +30,7 @@ namespace BasicCustomHUDRemake
         [Description("Update speed. Options: Fastest, Fast, Normal, Slow, Slowest, UnSync")]
         public HintSyncSpeed SyncSpeed { get; set; } = HintSyncSpeed.Normal;
 
-        [Description("Format string with {param} placeholders. Supports rich text tags.\n        # Common params: {playername}, {id}, {role}, {time}, {tps}, {nextspawn}, {warhead}, {spectatorcount}, {generatorcount}")]
+        [Description("Format string with {param} placeholders. Supports rich text tags.\n        # Common params: {playername}, {id}, {role}, {time}, {tps}, {nextspawn}, {nextwave}, {warhead}, {spectatorcount}, {generatorcount}")]
         public string Format { get; set; } = "";
     }
 
