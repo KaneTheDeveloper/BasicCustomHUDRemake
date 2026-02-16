@@ -20,6 +20,7 @@ namespace BasicCustomHUDRemake
         private readonly Dictionary<int, HintPair> _playerHints = new Dictionary<int, HintPair>();
         private readonly object _lock = new object();
         private readonly RulesManager _rulesManager = new RulesManager();
+        private readonly RoleConfigManager _roleConfigManager = new RoleConfigManager();
         private bool _disposed;
 
         /// <summary>
@@ -29,6 +30,7 @@ namespace BasicCustomHUDRemake
         {
             public Hint StandardHint;
             public Hint RulesHint;
+            public Hint AnnouncementHint;
         }
 
         public void StartHud()
@@ -41,11 +43,14 @@ namespace BasicCustomHUDRemake
                 {
                     string pluginDir = Path.Combine(PathManager.Configs.FullName, Server.Port.ToString(), "BasicCustomHUD");
                     if (!string.IsNullOrEmpty(pluginDir))
+                    {
                         _rulesManager.LoadRules(pluginDir);
+                        _roleConfigManager.LoadConfig(pluginDir);
+                    }
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error($"Failed to load rules: {ex.Message}");
+                    Logger.Error($"Failed to load configs: {ex.Message}");
                 }
 
                 if (BasicCustomHudPlugin.Instance.Config.Debug)
@@ -96,6 +101,7 @@ namespace BasicCustomHUDRemake
                         {
                             if (pair.StandardHint != null) display.RemoveHint(pair.StandardHint);
                             if (pair.RulesHint != null) display.RemoveHint(pair.RulesHint);
+                            if (pair.AnnouncementHint != null) display.RemoveHint(pair.AnnouncementHint);
                         }
                     }
                 }
@@ -137,6 +143,12 @@ namespace BasicCustomHUDRemake
                 {
                     pair.RulesHint = CreateHint(config.RulesHUD, hub);
                     display.AddHint(pair.RulesHint);
+                }
+
+                if (config.SpectatorAnnouncementHUD.Enabled)
+                {
+                    pair.AnnouncementHint = CreateHint(config.SpectatorAnnouncementHUD, hub);
+                    display.AddHint(pair.AnnouncementHint);
                 }
 
                 _playerHints[playerId] = pair;
@@ -186,7 +198,7 @@ namespace BasicCustomHUDRemake
                 }
 
                 var config = BasicCustomHudPlugin.Instance.Config;
-                return $"<size={settings.FontSize}>{HudParameterResolver.Resolve(settings.Format, player, _rulesManager, config.RulePassTime)}</size>";
+                return $"<size={settings.FontSize}>{HudParameterResolver.Resolve(settings.Format, player, _rulesManager, _roleConfigManager, config.RulePassTime)}</size>";
             }
             catch (Exception)
             {
@@ -210,6 +222,7 @@ namespace BasicCustomHUDRemake
                         {
                             if (kvp.Value.StandardHint != null) display.RemoveHint(kvp.Value.StandardHint);
                             if (kvp.Value.RulesHint != null) display.RemoveHint(kvp.Value.RulesHint);
+                            if (kvp.Value.AnnouncementHint != null) display.RemoveHint(kvp.Value.AnnouncementHint);
                         }
                     }
                 }

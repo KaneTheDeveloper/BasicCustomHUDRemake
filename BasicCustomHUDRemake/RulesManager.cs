@@ -14,12 +14,13 @@ namespace BasicCustomHUDRemake
     {
         private List<string> _rules = new List<string>();
         private int _currentIndex;
-        private DateTime _lastSwitch = DateTime.MinValue;
+        private DateTime _lastSwitch;
 
         public void LoadRules(string configDirectory)
         {
             _rules.Clear();
             _currentIndex = 0;
+            _lastSwitch = DateTime.UtcNow; // Fix: Initialize to now so first rule shows immediately
 
             if (!Directory.Exists(configDirectory))
             {
@@ -34,7 +35,7 @@ namespace BasicCustomHUDRemake
                 }
             }
 
-            string rulesPath = Path.Combine(configDirectory, "rules.txt");
+            string rulesPath = Path.Combine(configDirectory, "rules.yml");
 
             if (!File.Exists(rulesPath))
             {
@@ -43,10 +44,10 @@ namespace BasicCustomHUDRemake
                 {
                     File.WriteAllLines(rulesPath, new[]
                     {
-                        "No teamkilling allowed",
-                        "Respect all players",
-                        "Follow staff instructions",
-                        "Have fun!"
+                        "- No teamkilling allowed",
+                        "- Respect all players",
+                        "- Follow staff instructions",
+                        "- Have fun!"
                     });
                     Logger.Info($"Created default rules file at: {rulesPath}");
                 }
@@ -61,6 +62,9 @@ namespace BasicCustomHUDRemake
             {
                 var lines = File.ReadAllLines(rulesPath)
                     .Where(l => !string.IsNullOrWhiteSpace(l))
+                    .Select(l => l.Trim())
+                    .Where(l => l.StartsWith("-"))
+                    .Select(l => l.Substring(1).Trim())
                     .ToList();
 
                 _rules = lines;

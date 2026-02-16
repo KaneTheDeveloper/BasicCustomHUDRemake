@@ -31,6 +31,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="0Harmony, Version=2.3.6.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Lib.Harmony.2.3.6\lib\net48\0Harmony.dll</HintPath>
+    </Reference>
     <Reference Include="Assembly-CSharp">
       <HintPath>..\..\..\..\Desktop\SCPSLSERVER\SCPSL_Data\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
@@ -40,8 +43,8 @@
     <Reference Include="CommandSystem.Core">
       <HintPath>..\..\..\..\Desktop\SCPSLSERVER\SCPSL_Data\Managed\CommandSystem.Core.dll</HintPath>
     </Reference>
-    <Reference Include="HintServiceMeow-LabAPI">
-      <HintPath>..\..\..\..\Downloads\HintServiceMeow-LabAPI.dll</HintPath>
+    <Reference Include="HintServiceMeow, Version=5.4.1.0, Culture=neutral, processorArchitecture=AMD64">
+      <HintPath>..\packages\HintServiceMeow.5.4.1\lib\net48\HintServiceMeow.dll</HintPath>
     </Reference>
     <Reference Include="LabApi, Version=1.1.5.0, Culture=neutral, processorArchitecture=AMD64">
       <HintPath>..\packages\Northwood.LabAPI.1.1.5\lib\net48\LabApi.dll</HintPath>
@@ -51,6 +54,11 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.IO.Compression, Version=4.1.2.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.IO.Compression.4.3.0\lib\net46\System.IO.Compression.dll</HintPath>
+      <Private>True</Private>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -74,6 +82,7 @@
     <Compile Include="HudManager.cs" />
     <Compile Include="HudParameterResolver.cs" />
     <Compile Include="Plugin.cs" />
+    <Compile Include="RoleConfigManager.cs" />
     <Compile Include="RulesManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

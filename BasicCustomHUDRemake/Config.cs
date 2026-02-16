@@ -30,7 +30,7 @@ namespace BasicCustomHUDRemake
         [Description("Update speed. Options: Fastest, Fast, Normal, Slow, Slowest, UnSync")]
         public HintSyncSpeed SyncSpeed { get; set; } = HintSyncSpeed.Normal;
 
-        [Description("Format string with {param} placeholders. Supports rich text tags.")]
+        [Description("Format string with {param} placeholders. Supports rich text tags.\n        # Common params: {playername}, {id}, {role}, {time}, {tps}, {nextspawn}, {warhead}, {spectatorcount}, {generatorcount}")]
         public string Format { get; set; } = "";
     }
 
@@ -51,7 +51,7 @@ namespace BasicCustomHUDRemake
             FontSize = 20,
             Alignment = HintAlignment.Center,
             SyncSpeed = HintSyncSpeed.Normal,
-            Format = "<color=red>NAME:</color>{playername} | <color=green>TIME:</color>{time} | <color=#42e9f5>TPS:</color>{tps} | <color=blue>ROLE:</color>{role} | <color=#777777>ID:</color>{id}"
+            Format = "<color=red>NAME:</color>{playername} | <color=green>TIME:</color>{time} | <color=#42e9f5>TPS:</color>{tps} | <color=blue>ROLE:</color> {role} | <color=#777777>ID:</color>{id}\nNext Spawn: {nextspawn}"
         };
 
         [Description("Settings for the rotating rules display HUD.")]
@@ -65,6 +65,19 @@ namespace BasicCustomHUDRemake
             Alignment = HintAlignment.Center,
             SyncSpeed = HintSyncSpeed.Slow,
             Format = "<color=#ffcc00>{rules}</color>"
+        };
+
+        [Description("Settings for the spectator announcement HUD (fixed text above standard HUD).")]
+        public HudSettings SpectatorAnnouncementHUD { get; set; } = new HudSettings
+        {
+            Enabled = true,
+            OnlySpectator = true,
+            YCoordinate = 650,
+            XCoordinate = 0,
+            FontSize = 20,
+            Alignment = HintAlignment.Center,
+            SyncSpeed = HintSyncSpeed.Slow,
+            Format = "Join Our Discord Server!"
         };
 
         [Description("How many seconds before switching to the next rule in the {rules} parameter.")]
