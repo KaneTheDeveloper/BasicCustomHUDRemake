@@ -193,7 +193,7 @@ namespace BasicCustomHUDRemake
                 foreach (var gen in Map.Generators)
                 {
                     total++;
-                    if (gen.IsEngaged)
+                    if (gen.Engaged)
                         engaged++;
                 }
                 
@@ -214,13 +214,10 @@ namespace BasicCustomHUDRemake
 
                 if (Warhead.IsDetonationInProgress)
                 {
-                    // Use the base controller to get remaining time
-                    var controller = Warhead.BaseController;
-                    if (controller != null)
-                    {
-                        int timeLeft = (int)controller.DetonationTimer;
+                    // Use DetonationTime which represents the remaining time during countdown
+                    int timeLeft = (int)Warhead.DetonationTime;
+                    if (timeLeft > 0)
                         return $"Detonating in {timeLeft}s";
-                    }
                     return "Detonating";
                 }
 
